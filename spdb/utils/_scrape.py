@@ -7,7 +7,7 @@ import time
 
 def scrape_dataset_abstract(
     url: str,
-    wait_seconds: int = 10
+    wait_seconds: int = 1
 ) -> str:
     """
     Inputs:
