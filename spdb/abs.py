@@ -1,6 +1,8 @@
 from spdb.utils._scrape import scrape_dataset_abstract  
 from spdb.utils._llm import _llm_dataset_abstract
 from spdb.utils._else import get_elsevier_abstract_from_url
+from spdb.utils._ncbi import get_pmids_from_geo_with_selenium, sort_pmids_by_date, pmid_to_doi
+from spdb.utils._pubmed import get_pubmed_abstract
 import logging
 
 logger = logging.getLogger(__name__)
@@ -25,6 +27,15 @@ def get_abstract(url: str):
             return get_elsevier_abstract_from_url(url)
         except Exception as e:
             logger.error(f"Getting Elsevier abstract failed: {e}", exc_info=True)
+            pass
+    elif 'geo' in url:
+        try:
+            pmid = get_pmids_from_geo_with_selenium(url)
+            if len(pmid) > 1:
+                pmid = sort_pmids_by_date(pmid)[0]
+            return get_pubmed_abstract(pmid_to_doi(pmid))
+        except Exception as e:
+            logger.error(f"Getting GEO abstract failed: {e}", exc_info=True)
             pass
     elif any(x in url for x in llm_to_access):
         try:
